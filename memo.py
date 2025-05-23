@@ -1,9 +1,9 @@
-import json
 import os
+import uuid
 from dataclasses import dataclass
 
+# Directory where individual memo files are stored
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
-MEMO_FILE = os.path.join(DATA_DIR, "memos.json")
 
 @dataclass
 class Memo:
@@ -16,34 +16,53 @@ class Memo:
 
 
 class MemoStore:
+    """Store memos as individual text files identified by UUID."""
+
     def __init__(self):
         os.makedirs(DATA_DIR, exist_ok=True)
-        self.memos = {}
-        if os.path.exists(MEMO_FILE):
-            with open(MEMO_FILE, 'r', encoding='utf-8') as f:
-                try:
-                    data = json.load(f)
-                    if isinstance(data, dict):
-                        self.memos = {k: Memo(v) for k, v in data.items()}
-                except json.JSONDecodeError:
-                    self.memos = {}
 
-    def _save(self):
-        with open(MEMO_FILE, 'w', encoding='utf-8') as f:
-            json.dump({k: memo.text for k, memo in self.memos.items()}, f, ensure_ascii=False, indent=2)
+    def _memo_path(self, memo_id: str) -> str:
+        return os.path.join(DATA_DIR, f"{memo_id}.txt")
 
     def add_memo(self, content: str) -> str:
-        if self.memos:
-            new_id = str(max(int(k) for k in self.memos.keys()) + 1)
-        else:
-            new_id = "1"
-        self.memos[new_id] = Memo(content)
-        self._save()
-        return new_id
+        """Create a new memo with a UUID and save it."""
+        memo_id = str(uuid.uuid4())
+        with open(self._memo_path(memo_id), "w", encoding="utf-8") as f:
+            f.write(content)
+        return memo_id
 
     def get_memo(self, memo_id: str):
-        return self.memos.get(str(memo_id))
+        """Retrieve a memo by UUID."""
+        path = self._memo_path(memo_id)
+        if not os.path.exists(path):
+            return None
+        with open(path, "r", encoding="utf-8") as f:
+            return Memo(f.read())
+
+    def update_memo(self, memo_id: str, content: str) -> bool:
+        """Update an existing memo. Returns True if it exists."""
+        path = self._memo_path(memo_id)
+        if not os.path.exists(path):
+            return False
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(content)
+        return True
+
+    def delete_memo(self, memo_id: str) -> bool:
+        """Delete a memo file by UUID."""
+        path = self._memo_path(memo_id)
+        if not os.path.exists(path):
+            return False
+        os.remove(path)
+        return True
 
     def list_memos(self):
-        return [(memo_id, self.memos[memo_id]) for memo_id in sorted(self.memos.keys(), key=lambda x: int(x))]
-
+        """List all memos as tuples of (uuid, Memo)."""
+        memos = []
+        for filename in os.listdir(DATA_DIR):
+            if filename.endswith(".txt"):
+                memo_id = filename[:-4]
+                memo = self.get_memo(memo_id)
+                if memo is not None:
+                    memos.append((memo_id, memo))
+        return memos

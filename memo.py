@@ -4,6 +4,19 @@ import os
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 MEMO_FILE = os.path.join(DATA_DIR, "memos.json")
 
+class Memo:
+    """Simple memo class to store a text message."""
+
+    def __init__(self, text: str):
+        self.text = text
+
+    def __repr__(self) -> str:
+        return f"Memo({self.text!r})"
+
+    def __str__(self) -> str:
+        return self.text
+
+
 class MemoStore:
     def __init__(self):
         os.makedirs(DATA_DIR, exist_ok=True)
@@ -34,3 +47,4 @@ class MemoStore:
 
     def list_memos(self):
         return [(memo_id, self.memos[memo_id]) for memo_id in sorted(self.memos.keys(), key=lambda x: int(x))]
+

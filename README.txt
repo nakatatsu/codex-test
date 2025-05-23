@@ -1,4 +1,8 @@
+# Readme
+
 This repository demonstrates simple Python classes.
+
+This project was created with ChatGPT Codex.
 
 `memo.py` defines a `Memo` dataclass and a `MemoStore` that stores each memo in
 separate files under the `./data` directory. Each memo is identified by a UUID

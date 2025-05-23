@@ -4,12 +4,26 @@ This repository demonstrates simple Python classes.
 separate files under the `./data` directory. Each memo is identified by a UUID
 so updates and deletions are performed using that ID.
 
-`main.py` provides a command line interface to manage these memos. Example
-usage:
+`main.py` provides a command line interface to manage these memos. Available
+commands are:
+
+- `add` - create a new memo
+- `list` - list all existing memos
+- `get` - retrieve a memo by its UUID
+- `update` - change the text of a memo
+- `delete` - remove a memo
+
+Example usage:
 
 ```
 $ python main.py add "Buy milk"
 <uuid>
 $ python main.py list
 <uuid>: Buy milk
+$ python main.py get <uuid>
+Buy milk
+$ python main.py update <uuid> "Buy eggs"
+Updated
+$ python main.py delete <uuid>
+Deleted
 ```

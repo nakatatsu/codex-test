@@ -1,5 +1,4 @@
 This repository demonstrates simple Python classes.
 
-Current files:
-- main.py: prints a greeting.
-- memo.py: defines a `Memo` class for storing a text message.
+memo.py provides a `MemoStore` class that saves memo entries to JSON under `./data/memos.json`.
+
